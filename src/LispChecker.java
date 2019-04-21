@@ -1,3 +1,5 @@
+import java.util.EmptyStackException;
+import java.util.Stack;
 
 public class LispChecker {
 	
@@ -11,30 +13,26 @@ public class LispChecker {
 	 * Check if the given input's parentheses are properly closed and nested.
 	 */
 	public static boolean checkParentheses(String input) {
-		int scope = 0; // Current nested level
 		char[] inputChars = input.toCharArray();
+		Stack<Character> parenStack = new Stack<>();
 		
-		// Increase current nested level for each '(' encountered, 
-		// decrease for each ')'
+		// Push every '(' and pop every ')'
 		for (char character : inputChars) {
 			if (character == '(') {
-				scope++; 
+				parenStack.push(character);
 			} else if (character == ')') {
-				scope--;
-			}
-			
-			// Nested level cannot be negative
-			if (scope < 0) {
-				return false;
+				try {
+					parenStack.pop();
+				} catch (EmptyStackException ex) {
+					// This exception happens when a ')' comes before a '('
+					// Fail immediately
+					return false;
+				}
 			}
 		}
 		
-		// Nested level 0 means all parentheses cancelled each other out
-		if (scope == 0) {
-			return true;
-		} else {
-			return false;
-		}
+		// Empty stack means there was a ')' for every '('
+		return parenStack.empty();
 	}
 	
 }
